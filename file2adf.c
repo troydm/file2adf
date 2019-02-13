@@ -18,8 +18,10 @@
    OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <libgen.h>
 #include <adflib.h>
 
 #define BUF_SIZE 4096
@@ -64,13 +66,15 @@ int main(int argc, char *argv[]){
     }
 
     for(int i = 1; i < argc-2; i++){
+        char *filename;
         in = fopen(argv[i],"rb");
         if (!in) {
             fprintf(stderr, "couldn't open %s file\n", argv[i]);
             return EXIT_FAILURE;
         };
-        printf("adding %s to floppy\n", argv[i]);
-        file = adfOpenFile(vol, argv[i], "w");
+        filename = strdup(argv[i]);
+        printf("adding %s to floppy\n", filename);
+        file = adfOpenFile(vol, basename(filename), "w");
 
         n = fread(buf,sizeof(unsigned char),BUF_SIZE,in);
         while(!feof(in)) {
@@ -80,6 +84,7 @@ int main(int argc, char *argv[]){
         if (n > 0)
             adfWriteFile(file, n, buf);
 
+        free(filename);
         fclose(in);
         adfCloseFile(file);
     }
