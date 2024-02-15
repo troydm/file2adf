@@ -1,5 +1,5 @@
-CFLAGS=-O2 -I/usr/local/lib/adflib/include
-LDFLAGS=-L/usr/local/lib/adflib/lib -ladf
+CFLAGS=-O2 -I/usr/local/include/adf 
+LDFLAGS=-ladf
 
 file2adf: file2adf.c
 	cc $(CFLAGS) -c file2adf.c
