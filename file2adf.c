@@ -27,8 +27,8 @@
 #define BUF_SIZE 4096
 
 int main(int argc, char *argv[]){
-    struct AdfDevice *flop;
-    struct AdfVolume *vol;
+    struct AdfDevice *device;
+    struct AdfVolume *volume;
     struct AdfFile *file;
     int n;
     unsigned char buf[BUF_SIZE];
@@ -47,20 +47,21 @@ int main(int argc, char *argv[]){
 
     adfEnvInitDefault();
 
-    flop = adfCreateDumpDevice(adfile, 80, 2, 11);
-    if(!flop) {
+    device = adfDevCreate("dump", adfile, 80, 2, 11);
+
+    if(!device) {
         fprintf(stderr, "couldn't create floppy dump device\n");
         return EXIT_FAILURE;
     }
 
-    rc = adfCreateFlop(flop, name, FSMASK_DIRCACHE);
+    rc = adfCreateFlop(device, name, FSMASK_DIRCACHE);
     if(rc != RC_OK) {
         fprintf(stderr, "couldn't create floppy filesystem\n");
         return EXIT_FAILURE;
     }
 
-    vol = adfMount(flop, 0, FALSE);
-    if(!vol) {
+    volume = adfMount(device, 0, FALSE);
+    if(!volume) {
         fprintf(stderr, "couldn't mount floppy\n");
         return EXIT_FAILURE;
     }
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]){
         };
         filename = strdup(argv[i]);
         printf("adding %s to floppy\n", filename);
-        file = adfFileOpen(vol, basename(filename), ADF_FILE_MODE_WRITE);
+        file = adfFileOpen(volume, basename(filename), ADF_FILE_MODE_WRITE);
 
         n = fread(buf,sizeof(unsigned char),BUF_SIZE,in);
         while(!feof(in)) {
@@ -89,8 +90,8 @@ int main(int argc, char *argv[]){
         adfFileClose(file);
     }
 
-    adfUnMount(vol);
-    adfUnMountDev(flop);
+    adfUnMount(volume);
+    adfDevUnMount(device);
 
     adfEnvCleanUp();
     return EXIT_SUCCESS;
