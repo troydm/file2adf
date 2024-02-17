@@ -27,9 +27,9 @@
 #define BUF_SIZE 4096
 
 int main(int argc, char *argv[]){
-    struct Device *flop;
-    struct Volume *vol;
-    struct File* file;
+    struct AdfDevice *flop;
+    struct AdfVolume *vol;
+    struct AdfFile *file;
     int n;
     unsigned char buf[BUF_SIZE];
     FILE* in;
@@ -74,19 +74,19 @@ int main(int argc, char *argv[]){
         };
         filename = strdup(argv[i]);
         printf("adding %s to floppy\n", filename);
-        file = adfOpenFile(vol, basename(filename), "w");
+        file = adfFileOpen(vol, basename(filename), ADF_FILE_MODE_WRITE);
 
         n = fread(buf,sizeof(unsigned char),BUF_SIZE,in);
         while(!feof(in)) {
-            adfWriteFile(file, n, buf);
+            adfFileWrite(file, n, buf);
             n = fread(buf,sizeof(unsigned char),BUF_SIZE,in);
         }
         if (n > 0)
-            adfWriteFile(file, n, buf);
+            adfFileWrite(file, n, buf);
 
         free(filename);
         fclose(in);
-        adfCloseFile(file);
+        adfFileClose(file);
     }
 
     adfUnMount(vol);
