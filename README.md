@@ -11,7 +11,7 @@ usage example
 dependencies
 ------------
 [ADFlib](https://github.com/lclevy/ADFlib)
-*For Apple Silicon, you need to build ADFLib for arm64.*
+*For Apple Silicon, you need to build ADFLib v0.9 for arm64.*
 
 
 license

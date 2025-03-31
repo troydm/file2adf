@@ -1,4 +1,4 @@
-CFLAGS=-O2 -I/usr/local/include/adf 
+CFLAGS=-O2 -I/usr/local/include/adf
 LDFLAGS=-ladf
 
 file2adf: file2adf.c

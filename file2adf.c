@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
     unsigned char buf[BUF_SIZE];
     FILE* in;
     char *adfile, *name;
-    RETCODE rc;
+    ADF_RETCODE rc;
 
     if(argc < 4) {
         fprintf(stderr, "file2adf [file [file2]] adfile name\n");
@@ -43,25 +43,27 @@ int main(int argc, char *argv[]){
 
     adfile = argv[argc-2];
     name = argv[argc-1];
-    printf("creating %s floppy dump with name %s\n", adfile, name);
+    printf("creating %s floppy dump with name '%s'\n", adfile, name);
 
     adfEnvInitDefault();
 
-    flop = adfCreateDumpDevice(adfile, 80, 2, 11);
+    flop = adfDevCreate("dump", adfile, 80, 2, 11);
     if(!flop) {
         fprintf(stderr, "couldn't create floppy dump device\n");
         return EXIT_FAILURE;
     }
 
-    rc = adfCreateFlop(flop, name, FSMASK_DIRCACHE);
-    if(rc != RC_OK) {
+    rc = adfCreateFlop(flop, name, ADF_DOSFS_DIRCACHE);
+    if(rc != ADF_RC_OK) {
         fprintf(stderr, "couldn't create floppy filesystem\n");
+        adfDevClose(flop);
         return EXIT_FAILURE;
     }
 
-    vol = adfMount(flop, 0, FALSE);
+    vol = adfVolMount(flop, 0, ADF_ACCESS_MODE_READWRITE);
     if(!vol) {
         fprintf(stderr, "couldn't mount floppy\n");
+        adfDevClose(flop);
         return EXIT_FAILURE;
     }
 
@@ -89,8 +91,9 @@ int main(int argc, char *argv[]){
         adfFileClose(file);
     }
 
-    adfUnMount(vol);
-    adfUnMountDev(flop);
+    adfVolUnMount(vol);
+    adfDevUnMount(flop);
+    adfDevClose(flop);
 
     adfEnvCleanUp();
     return EXIT_SUCCESS;
